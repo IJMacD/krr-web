@@ -70,13 +70,13 @@ function RecommendationCell({ result, resource, type }: { result: ScanResult; re
 
     if (resource === "cpu") {
         currentValueString = typeof currentValue === "number" ? currentValue.toFixed(3) : <span style={unsetStyle}>unset</span>;
-        recommendedValueString = recommendedValue === "?" ? <span>Unknown</span> : (
+        recommendedValueString = recommendedValue === "?" ? <span>{result.recommended.info[resource]}</span> : (
             typeof recommendedValue === "number" ? recommendedValue.toFixed(3) : <span style={unsetStyle}>unset</span>
         );
     }
     else {
         currentValueString = typeof currentValue === "number" ? formatBytes(currentValue) : <span style={unsetStyle}>unset</span>;
-        recommendedValueString = recommendedValue === "?" ? <span>Unknown</span> : (
+        recommendedValueString = recommendedValue === "?" ? <span>{result.recommended.info[resource]}</span> : (
             typeof recommendedValue === "number" ? formatBytes(recommendedValue) : <span style={unsetStyle}>unset</span>
         );
     }

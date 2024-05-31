@@ -14,15 +14,21 @@ function App() {
     if (dataSource === "live") {
       let current = true;
 
-      fetch("/recommended")
-        .then(r => r.json())
-        .then(d => {
-          if (current) {
-            setData(d);
-          }
-        });
+      function run() {
+        fetch("/recommended")
+          .then(r => r.json())
+          .then(d => {
+            if (current) {
+              setData(d);
+            }
+          });
+      }
 
-      return () => { current = false; }
+      run();
+
+      const id = setInterval(run, 5 * 60 * 1000);
+
+      return () => { current = false; clearInterval(id); }
     }
   }, [dataSource]);
 

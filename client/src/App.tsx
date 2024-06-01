@@ -3,6 +3,7 @@ import './App.css'
 import { RecommendationResult } from './types';
 import { ScanResults } from './ScanResults';
 import { ErrorBoundary } from './ErrorBoundary';
+import { SimulatedProgressBar } from './SimulatedProgressBar';
 
 type DataSource = "live" | "file"
 
@@ -69,7 +70,7 @@ function App() {
       </div>
       <input type="file" onChange={handleFileInput} accept=".json" />
 
-      {dataSource === "live" && !data && <p>Loading...</p>}
+      {dataSource === "live" && !data && <p>Loading...<SimulatedProgressBar estimatedDuration={30 * 1000} /></p>}
 
       <ErrorBoundary>
         {data && <ScanResults results={data} />}

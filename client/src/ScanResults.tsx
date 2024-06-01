@@ -58,36 +58,45 @@ function RecommendationCell({ result, resource, type }: { result: ScanResult; re
     let currentValueString: ReactNode;
     let recommendedValueString: ReactNode;
 
-    const currentValueNumber = typeof currentValue === "number" ? currentValue : NaN;
-    const recommendedValueNumber = typeof recommendedValue === "number" ? recommendedValue : NaN;
-
-    let difference = (recommendedValueNumber - currentValueNumber) / currentValueNumber;
-
     const unsetStyle: CSSProperties = {
         color: "#666",
         fontStyle: "italic",
     };
 
+    const unknownStyle: CSSProperties = {
+        fontSize: "0.8em",
+    };
+
     if (resource === "cpu") {
         currentValueString = typeof currentValue === "number" ? currentValue.toFixed(3) : <span style={unsetStyle}>unset</span>;
-        recommendedValueString = recommendedValue === "?" ? <span>{result.recommended.info[resource]}</span> : (
+        recommendedValueString = recommendedValue === "?" ? <span style={unknownStyle}>{result.recommended.info[resource]}</span> : (
             typeof recommendedValue === "number" ? recommendedValue.toFixed(3) : <span style={unsetStyle}>unset</span>
         );
     }
     else {
         currentValueString = typeof currentValue === "number" ? formatBytes(currentValue) : <span style={unsetStyle}>unset</span>;
-        recommendedValueString = recommendedValue === "?" ? <span>{result.recommended.info[resource]}</span> : (
+        recommendedValueString = recommendedValue === "?" ? <span style={unknownStyle}>{result.recommended.info[resource]}</span> : (
             typeof recommendedValue === "number" ? formatBytes(recommendedValue) : <span style={unsetStyle}>unset</span>
         );
     }
 
+    // const noRecommendation = recommendedValue === "?";
     const noChange = currentValue === recommendedValue;
-    const isClose = noChange || Math.abs(difference) < 0.10;
+    // const isClose = noChange || Math.abs(difference) < 0.10;
+
+    // const fill = noRecommendation ? "grey" : (isClose ? "green" : (difference > 0 ? "red" : "orange"));
+
+    const fill = {
+        "GOOD": "green",
+        "WARNING": "red",
+        "OK": "orange",
+        "UNKNOWN": "grey",
+    }[result.recommended[type][resource].severity];
 
     return (
         <>
-            <svg viewBox="0 0 10 10" style={{ height: 16, marginRight: 4 }}><circle cx={5} cy={5} r={5} fill={isClose ? "green" : (difference > 0 ? "red" : "orange")} /></svg>
-            {noChange ? currentValueString : <>{currentValueString}  -&gt;  {recommendedValueString} </>}
+            <svg viewBox="0 0 10 10" style={{ height: 16, marginRight: 4 }}><circle cx={5} cy={5} r={5} fill={fill} /></svg>
+            {noChange ? currentValueString : <>{currentValueString}  →  {recommendedValueString}</>}
         </>
     );
 }

@@ -1,16 +1,23 @@
-import { CSSProperties, ReactNode, useState } from "react";
+import React, { CSSProperties, ReactNode, useState } from "react";
 import { RecommendationResult, ScanResult } from "./types";
+import { useSavedState } from "./useSavedState";
 
 export function ScanResults({ results }: { results: RecommendationResult }) {
     const [filter, setFilter] = useState("");
+    const [hiddenNamespaces, setHiddenNamespaces] = useSavedState("krr-web.hiddenNamespaces", [] as string[]);
 
-    const scans = results.scans.filter(scan => scan.object.namespace.includes(filter) || scan.object.name.includes(filter));
+    const scans = results.scans
+        .filter(scan => !hiddenNamespaces.includes(scan.object.namespace))
+        .filter(scan => scan.object.namespace.includes(filter) || scan.object.name.includes(filter));
 
     scans.sort((a, b) => a.object.namespace.localeCompare(b.object.namespace));
 
+    const allNamespaces = [...new Set(results.scans.map(s => s.object.namespace))];
+
     return (
         <>
-            <h2>Score: {results.score}</h2>
+            <p style={{ fontSize: "2em" }}>Score: {results.score}</p>
+            <HiddenNamespaceUI allNamespaces={allNamespaces} hiddenNamespaces={hiddenNamespaces} setHiddenNamespaces={setHiddenNamespaces} />
             <div style={{ display: "flex", justifyContent: "flex-end" }}>
                 <input type="search" value={filter} onChange={e => setFilter(e.target.value)} placeholder="Filter" />
             </div>
@@ -120,4 +127,67 @@ function formatBytes(bytes: number) {
     }
 
     return "big";
+}
+
+function HiddenNamespaceUI({ allNamespaces, hiddenNamespaces, setHiddenNamespaces }: { allNamespaces: string[], hiddenNamespaces: string[], setHiddenNamespaces: React.Dispatch<React.SetStateAction<string[]>> }) {
+    const [textInput, setTextInput] = useState("");
+
+    function handleRemoveNamespace(namespace: string) {
+        setHiddenNamespaces(nss => nss.filter(ns => ns !== namespace));
+    }
+
+    function handleAddNamespace() {
+        setHiddenNamespaces(namespaces => {
+            if (!namespaces.includes(textInput)) {
+                return [...namespaces, textInput];
+            }
+            return namespaces;
+        });
+        setTextInput("");
+    }
+
+    const namespaceStyle: CSSProperties = {
+        border: "1px solid #338",
+        borderRadius: 3,
+        paddingLeft: 4,
+        marginInlineEnd: 8,
+        // display: "flex"
+    }
+
+    const namespaceButtonStyle: CSSProperties = {
+        background: "transparent",
+        padding: "8px 8px",
+        margin: "-1px -1px -1px",
+        borderRadius: 0,
+        borderTopRightRadius: 3,
+        borderBottomRightRadius: 3,
+        lineHeight: "100%",
+    }
+
+    const inputStyle: CSSProperties = {
+        border: "none",
+        outline: "none",
+        fontSize: "inherit",
+        padding: "4px 0"
+    }
+
+    return (<>
+        <label style={{ fontSize: "1.5em" }}>Hidden Namespaces:</label>
+        <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap" }}>
+            {
+                hiddenNamespaces.map(ns => <span key={ns} style={namespaceStyle}>{ns} <button onClick={() => handleRemoveNamespace(ns)} style={namespaceButtonStyle}>&times;</button></span>)
+            }
+            <span style={namespaceStyle}>
+                {/* <input value={textInput} onChange={e => setTextInput(e.target.value)} style={inputStyle} /> */}
+                <select value={textInput} onChange={e => setTextInput(e.target.value)} style={inputStyle}>
+                    <option></option>
+                    {
+                        allNamespaces.filter(ns => !hiddenNamespaces.includes(ns)).map(ns => <option key={ns}>{ns}</option>)
+                    }
+                </select>
+                <button onClick={handleAddNamespace} style={namespaceButtonStyle}>Hide</button>
+            </span>
+        </div>
+    </>
+    );
 }

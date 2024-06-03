@@ -35,3 +35,13 @@
 .ScanResults-ResultsTable td {
   border-bottom: 1px solid #CCC;
 }
+
+@keyframes blink {
+  50% {
+    opacity: 0.0;
+  }
+}
+
+.blink {
+  animation: blink 1s step-start 0s infinite;
+}

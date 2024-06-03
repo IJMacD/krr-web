@@ -72,4 +72,4 @@ interface Recommendation {
     severity: Severity;
 }
 
-type Severity = "WARNING" | "OK" | "GOOD" | "UNKNOWN";
+type Severity = "CRITICAL" | "WARNING" | "OK" | "GOOD" | "UNKNOWN";

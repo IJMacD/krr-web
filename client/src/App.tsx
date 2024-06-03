@@ -10,6 +10,7 @@ type DataSource = "live" | "file"
 function App() {
   const [data, setData] = useState(null as RecommendationResult | null)
   const [dataSource, setDataSource] = useState("live" as DataSource)
+  const [error, setError] = useState(null as Error | null)
 
   useEffect(() => {
     if (dataSource === "live") {
@@ -22,7 +23,8 @@ function App() {
             if (current) {
               setData(d);
             }
-          });
+          })
+          .catch(setError);
       }
 
       run();
@@ -68,13 +70,21 @@ function App() {
           File
         </label>
       </div>
-      <input type="file" onChange={handleFileInput} accept=".json" />
+      {dataSource === "file" && <input type="file" onChange={handleFileInput} accept=".json" />}
 
-      {dataSource === "live" && !data && <p>Loading...<SimulatedProgressBar estimatedDuration={30 * 1000} /></p>}
+      {error ?
+        <>
+          <h2>Erorr loading Data</h2>
+          <p>{error.message}</p>
+        </> :
+        <>
+          {dataSource === "live" && !data && <p>Loading...<SimulatedProgressBar estimatedDuration={30 * 1000} /></p>}
 
-      <ErrorBoundary>
-        {data && <ScanResults results={data} />}
-      </ErrorBoundary>
+          <ErrorBoundary>
+            {data && <ScanResults results={data} />}
+          </ErrorBoundary>
+        </>
+      }
     </>
   )
 }

@@ -34,7 +34,7 @@ export function ScanResults({ results }: { results: RecommendationResult }) {
                 <tbody>
                     {
                         scans.map(scan =>
-                            <tr key={`${scan.object.namespace}:${scan.object.kind}/${scan.object.name}:${scan.object.container}`}>
+                            <tr key={containerKey(scan)}>
                                 <td>{scan.object.namespace}</td>
                                 <td>{scan.object.kind}/{scan.object.name}</td>
                                 <td>{scan.object.container}</td>
@@ -49,6 +49,10 @@ export function ScanResults({ results }: { results: RecommendationResult }) {
             </table>
         </>
     );
+}
+
+function containerKey(scan: ScanResult) {
+    return `${scan.object.namespace}:${scan.object.kind}/${scan.object.name}{${scan.object.container}}`;
 }
 
 function RecommendationCell({ result, resource, type }: { result: ScanResult; resource: "cpu" | "memory"; type: "requests" | "limits" }) {
@@ -87,15 +91,20 @@ function RecommendationCell({ result, resource, type }: { result: ScanResult; re
     // const fill = noRecommendation ? "grey" : (isClose ? "green" : (difference > 0 ? "red" : "orange"));
 
     const fill = {
-        "GOOD": "green",
+        "CRITICAL": "red",
         "WARNING": "red",
+        "GOOD": "green",
         "OK": "orange",
         "UNKNOWN": "grey",
     }[result.recommended[type][resource].severity];
 
+    const className =
+        result.recommended[type][resource].severity === "CRITICAL"
+            ? "blink" : undefined;
+
     return (
         <>
-            <svg viewBox="0 0 10 10" style={{ height: 16, marginRight: 4 }}><circle cx={5} cy={5} r={5} fill={fill} /></svg>
+            <svg viewBox="0 0 10 10" style={{ height: 16, marginRight: 4 }} className={className}><circle cx={5} cy={5} r={5} fill={fill} /></svg>
             {noChange ? currentValueString : <>{currentValueString}  →  {recommendedValueString}</>}
         </>
     );
@@ -105,7 +114,7 @@ function formatBytes(bytes: number) {
     const units = ["bytes", "kiB", "MiB", "GiB", "TiB", "PiB"];
 
     for (let i = 0; i < units.length; i++) {
-        if (bytes < 1024) return `${bytes}\xa0${units[i]}`;
+        if (bytes < 1024) return `${bytes.toFixed()}\xa0${units[i]}`;
 
         bytes /= 1024;
     }

@@ -91,11 +91,9 @@ function RecommendationCell({ result, resource, type }: { result: ScanResult; re
         );
     }
 
-    // const noRecommendation = recommendedValue === "?";
     const noChange = currentValue === recommendedValue;
-    // const isClose = noChange || Math.abs(difference) < 0.10;
-
-    // const fill = noRecommendation ? "grey" : (isClose ? "green" : (difference > 0 ? "red" : "orange"));
+    const isIncrease = typeof recommendedValue === "number" && typeof currentValue === "number" && recommendedValue > currentValue;
+    const isDecrease = typeof recommendedValue === "number" && typeof currentValue === "number" && recommendedValue < currentValue;
 
     const fill = {
         "CRITICAL": "red",
@@ -109,10 +107,12 @@ function RecommendationCell({ result, resource, type }: { result: ScanResult; re
         result.recommended[type][resource].severity === "CRITICAL"
             ? "blink" : undefined;
 
+    const arr = isIncrease ? "↗" : (isDecrease ? "↘" : "→");
+
     return (
         <>
             <svg viewBox="0 0 10 10" style={{ height: 16, marginRight: 4 }} className={className}><circle cx={5} cy={5} r={5} fill={fill} /></svg>
-            {noChange ? currentValueString : <>{currentValueString}  →  {recommendedValueString}</>}
+            {noChange ? currentValueString : <>{currentValueString} {arr} {recommendedValueString}</>}
         </>
     );
 }

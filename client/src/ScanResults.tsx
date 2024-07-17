@@ -1,6 +1,7 @@
 import React, { CSSProperties, ReactNode, useState } from "react";
 import { RecommendationResult, ScanResult } from "./types";
 import { useSavedState } from "./useSavedState";
+import { forumFormat } from "./forum-formatter";
 
 export function ScanResults({ results }: { results: RecommendationResult }) {
     const [filter, setFilter] = useState("");
@@ -17,7 +18,7 @@ export function ScanResults({ results }: { results: RecommendationResult }) {
     return (
         <>
             <p style={{ fontSize: "2em" }}>Score: {results.score}</p>
-            <pre>{results.description}</pre>
+            <pre dangerouslySetInnerHTML={{ __html: forumFormat(results.description) }} />
             <HiddenNamespaceUI allNamespaces={allNamespaces} hiddenNamespaces={hiddenNamespaces} setHiddenNamespaces={setHiddenNamespaces} />
             <div style={{ display: "flex", justifyContent: "flex-end" }}>
                 <input type="search" value={filter} onChange={e => setFilter(e.target.value)} placeholder="Filter" />

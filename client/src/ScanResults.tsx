@@ -17,6 +17,7 @@ export function ScanResults({ results }: { results: RecommendationResult }) {
     return (
         <>
             <p style={{ fontSize: "2em" }}>Score: {results.score}</p>
+            <pre>{results.description}</pre>
             <HiddenNamespaceUI allNamespaces={allNamespaces} hiddenNamespaces={hiddenNamespaces} setHiddenNamespaces={setHiddenNamespaces} />
             <div style={{ display: "flex", justifyContent: "flex-end" }}>
                 <input type="search" value={filter} onChange={e => setFilter(e.target.value)} placeholder="Filter" />
@@ -119,9 +120,13 @@ function RecommendationCell({ result, resource, type }: { result: ScanResult; re
 
 function formatBytes(bytes: number) {
     const units = ["bytes", "kiB", "MiB", "GiB", "TiB", "PiB"];
+    const NBSP = `\xa0`;
 
     for (let i = 0; i < units.length; i++) {
-        if (bytes < 1024) return `${bytes.toFixed()}\xa0${units[i]}`;
+        // Use fixed number of significant figures
+        if (bytes < 10) return `${bytes.toFixed(2)}${NBSP}${units[i]}`;
+        if (bytes < 100) return `${bytes.toFixed(1)}${NBSP}${units[i]}`;
+        if (bytes < 1000) return `${bytes.toFixed()}${NBSP}${units[i]}`;
 
         bytes /= 1024;
     }

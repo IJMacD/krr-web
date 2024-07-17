@@ -72,7 +72,7 @@ spec:
     spec:
       containers:
         - name: krr-web
-          image: "ijmacd/krr-web:1.1.0"
+          image: "ijmacd/krr-web:1.2.0"
           command: ["python", "server.py"]
           args:
             - "simple"

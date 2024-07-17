@@ -90,6 +90,12 @@ spec:
           ports:
             - name: web
               containerPort: 8080
+          resources:
+            requests:
+              cpu: 5m
+              memory: 364Mi
+            limits:
+              memory: 364Mi
       serviceAccountName: krr-web
 ---
 apiVersion: v1

@@ -5,7 +5,7 @@ RUN ["yarn", "install", "--frozen-lockfile"]
 COPY client .
 RUN ["yarn", "build"]
 
-FROM ijmacd/krr:1.9.0 AS final
+FROM robustadev/krr:v1.13.0 AS final
 COPY server.py .
 COPY --from=build /app/dist .
 CMD ["python", "server.py", "simple"]

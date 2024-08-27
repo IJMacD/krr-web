@@ -3,7 +3,7 @@ from os import getenv
 import sys
 import subprocess
 
-port=getenv("PORT", 8080)
+port=int(getenv("PORT", 8080))
 
 def run(server_class=HTTPServer, handler_class=BaseHTTPRequestHandler):
     server_address=('',port)
@@ -33,7 +33,12 @@ class RequestHandler(SimpleHTTPRequestHandler):
             else:
                 self.send_response(500)
                 self.end_headers()
-                self.wfile.write(result.stderr)
+                if (len(result.stderr)):
+                    self.wfile.write(result.stderr)
+                elif (len(result.stdout)):
+                    self.wfile.write(result.stdout)
+                else:
+                    self.wfile.write("Error: return code {0}".format(result.returncode).encode())
         else:
             super().do_GET()
 
